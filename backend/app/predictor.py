@@ -1,6 +1,8 @@
 import pandas as pd
-from catboost import CatBoostClassifier, Pool
+from catboost import CatBoostClassifier, CatboostError, Pool
 import random
+
+from .generator import generate_message
 
 # Load the model
 model = CatBoostClassifier()
@@ -8,7 +10,7 @@ try:
     model.load_model("the_sorting_hat_2.0_model.cbm")
 except FileNotFoundError:
     print("Model file not found. Make sure the path is correct.")
-except CatBoostError as e:
+except CatboostError as e:
     print(f"Error loading model: {e}")
 
 threshold=0.15
@@ -40,7 +42,6 @@ def predict_house(student_data: object):
     cat_features = ["Blood Status"]
     student_pool = Pool(data=student, cat_features=cat_features)
 
-
     try:
         predicted_house = model.predict(student_pool).item()
         probabilities = model.predict_proba(student_pool)[0]
@@ -49,36 +50,16 @@ def predict_house(student_data: object):
 
     prob_dict = dict(zip(model.classes_, probabilities))
 
-    sorted_probs = sorted(prob_dict.items(), key=lambda x: x[1], reverse=True)
-    top_house, top_prob = sorted_probs[0]
-    second_house, second_prob = sorted_probs[1]
-
-    close_message = ""
-    if top_prob - second_prob < threshold:
-        close_message = "You have multiple strong traits that made it difficult to place you in one house, " \
-                        "but a Sorting Hat never fails! "
-
-    house_emoji = {"Gryffindor": "🦁", "Hufflepuff": "🦡", "Ravenclaw": "🦅", "Slytherin": "🐍"}
-    house_messages = {
-        "Gryffindor": ["Your courage and daring spirit make you a true Gryffindor!"],
-        "Hufflepuff": ["Your loyalty and dedication shine bright in Hufflepuff!"],
-        "Ravenclaw": ["Your wisdom and creativity belong in Ravenclaw!"],
-        "Slytherin": ["Your ambition and cunning mark you as a true Slytherin!"]
-    }
-
-    selected_message = random.choice(house_messages[predicted_house])
-
-    house_traits = {
-        "Gryffindor": ["Bravery", "Ambition"],
-        "Hufflepuff": ["Loyalty", "Bravery"],
-        "Ravenclaw": ["Intelligence", "Creativity"],
-        "Slytherin": ["Ambition", "Dark Arts Knowledge"]
-    }
-    top_traits = house_traits[predicted_house]
-
-    message = f"🎓 {student_data.name}, welcome to {predicted_house}! {house_emoji[predicted_house]}\n\n"
-    message += f"The Sorting Hat has spoken! You are exceptional in {top_traits[0].lower()} and {top_traits[1].lower()}. "
-    message += "But remember, your house placement considers all your traits — bravery, intelligence, loyalty, ambition, dark arts knowledge, and more. "
-    message += close_message + selected_message
-
+    student_info = str(student_data)
+    prob_info = str(prob_dict)
+    message = generate_message(
+    "You are the famous Harry Potter Sorting Hat. Write a personalised message for this student. "
+    "Do not reveal any raw scores or probability values. "
+    "Keep the response within 250 words. "
+    "If the student has strong traits from multiple houses, mention that it was difficult to decide, "
+    "and explain how their personality shows qualities from more than one house. "
+    f"Student data: {student_info} "
+    f"Predicted house: {predicted_house} "
+    f"Predicted probabilities: {prob_info}"
+    )
     return predicted_house, prob_dict, message

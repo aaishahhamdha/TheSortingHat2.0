@@ -2,3 +2,5 @@ fastapi
 uvicorn
 catboost
 pandas
+python-dotenv
+google-generativeai
