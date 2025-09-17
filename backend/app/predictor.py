@@ -52,14 +52,31 @@ def predict_house(student_data: object):
 
     student_info = str(student_data)
     prob_info = str(prob_dict)
-    message = generate_message(
+    message_hat = generate_message(
     "You are the famous Harry Potter Sorting Hat. Write a personalised message for this student. "
     "Do not reveal any raw scores or probability values. "
-    "Keep the response within 250 words. "
+    "Keep the response within 100-120 words. "
+    "Use conversational fillers like 'ahh', 'mmm', or dramatic expressions. "
     "If the student has strong traits from multiple houses, mention that it was difficult to decide, "
     "and explain how their personality shows qualities from more than one house. "
     f"Student data: {student_info} "
     f"Predicted house: {predicted_house} "
     f"Predicted probabilities: {prob_info}"
     )
-    return predicted_house, prob_dict, message
+
+    message_doc = generate_message(
+        f"You are a result generator who explains in simple and clear language why a student was placed into a specific house based on their personality traits. "
+        f"Start with 'You belong in {predicted_house}.' or 'Your house is {predicted_house}.' "
+        "Do not use conversational fillers like 'ahh', 'mmm', or dramatic expressions. "
+        "Do not reveal any raw scores or probability values. "
+        "Keep the response within 250 words. "
+        "Use plain, age-friendly wording that children can understand, while keeping the style like a short evaluation report. "
+        "If the student has strong traits from multiple houses, mention that it was difficult to decide, "
+        "and explain how their personality shows qualities from more than one house. "
+        f"Hats thinking and sorting: {message_hat} "
+        f"Student data: {student_info} "
+        f"Predicted house: {predicted_house} "
+        f"Predicted probabilities: {prob_info}"
+    )
+
+    return predicted_house, prob_dict, message_hat, message_doc

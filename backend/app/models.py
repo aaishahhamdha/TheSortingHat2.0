@@ -16,4 +16,5 @@ class PredictionResponse(BaseModel):
     name: str
     predicted_house: str
     house_probabilities: dict
-    message: str
+    message_hat: str
+    message_doc: str

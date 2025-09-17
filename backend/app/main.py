@@ -23,10 +23,11 @@ def root():
 
 @app.post("/sort",response_model=PredictionResponse)
 def sort(student: Student):
-    predicted_house,house_probabilities,message = predict_house(student)
+    predicted_house, house_probabilities, message_hat, message_doc = predict_house(student)
     return {
         "name": student.name,
         "predicted_house": predicted_house,
         "house_probabilities": house_probabilities,
-        "message": message
+        "message_hat": message_hat,
+        "message_doc":message_doc
     }
